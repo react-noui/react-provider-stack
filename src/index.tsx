@@ -1,4 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import { PropsWithChildren, ReactNode, useMemo } from 'react';
 
-export default function ReactProviderStack({ children }) {
+interface ProviderStackProps {
+  children: ReactNode
+  providers: Array<({ children }: PropsWithChildren) => JSX.Element>
+}
+
+export default function ProviderStack({ providers, children }: ProviderStackProps) {
+  const Providers = useMemo(() => providers.reduceRight((Acc, Provider) => () => <Provider><Acc /></Provider>, () => <>{children}</>), [children, providers]);
+  return <Providers />
 }

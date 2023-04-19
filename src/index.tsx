@@ -9,22 +9,20 @@ export default function ProviderStack({
   providers,
   children,
 }: ProviderStackProps) {
-  const Providers = useMemo(
-    () =>
-      providers.reduceRight(
-        (Acc, Provider) =>
-          Object.assign(
-            () => (
-              <Provider>
-                <Acc />
-              </Provider>
-            ),
-            { displayName: Provider.displayName },
-          ),
-        () => <>{children}</>,
-      ),
-    [children, providers],
-  );
+  const { Provider, remainingProviders, isFinal } = useMemo(() => {
+    const [Provider, ...remainingProviders] = providers;
+    return {
+      Provider,
+      remainingProviders,
+      isFinal: providers.length === 0,
+    };
+  }, [providers]);
 
-  return <Providers />;
+  return isFinal ? (
+    <>{children}</>
+  ) : (
+    <Provider>
+      <ProviderStack providers={remainingProviders}>{children}</ProviderStack>
+    </Provider>
+  );
 }
